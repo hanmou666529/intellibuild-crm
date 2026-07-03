@@ -214,7 +214,7 @@ mysql -u root -p ry-vue < sql/ry-vue.sql
 # 第 9-11 行
 url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
 username: root          # 改为你的数据库用户名
-password: Hae147258369  # 改为你的数据库密码
+password: password  # 改为你的数据库密码
 ```
 
 ---
