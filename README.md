@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="logo" src="logo.png" width="80">
+  <img alt="logo" src="image/logo.png" width="80">
 </p>
 <h1 align="center">智营 CRM · IntelliBuild CRM</h1>
 <p align="center">
@@ -91,7 +91,7 @@
 超级管理员拥有系统全部权限，包括系统管理、CRM 管理等完整菜单。
 
 <p align="center">
-  <img alt="超级管理员主页面" src="1.png" width="90%">
+  <img alt="超级管理员主页面" src="image/1.png" width="90%">
 </p>
 
 ---
@@ -101,7 +101,7 @@
 工作台聚合关键业务数据与快捷操作入口。
 
 <p align="center">
-  <img alt="超级管理员工作台" src="2.png" width="90%">
+  <img alt="超级管理员工作台" src="image/2.png" width="90%">
 </p>
 
 ---
@@ -111,7 +111,7 @@
 对建材产品进行分类管理与信息维护，支持产品上下架管理。
 
 <p align="center">
-  <img alt="建材产品管理" src="3.png" width="90%">
+  <img alt="建材产品管理" src="image/3.png" width="90%">
 </p>
 
 ---
@@ -121,7 +121,7 @@
 集成 AI Copilot，支持自然语言查询客户、订单、合同等数据。
 
 <p align="center">
-  <img alt="AI助手模块" src="4.png" width="90%">
+  <img alt="AI助手模块" src="image/4.png" width="90%">
 </p>
 
 ---
@@ -131,7 +131,7 @@
 经理角色拥有 CRM 业务相关菜单，相比超级管理员少了系统管理、菜单管理等后台管理功能。
 
 <p align="center">
-  <img alt="经理工作台" src="5.png" width="90%">
+  <img alt="经理工作台" src="image/5.png" width="90%">
 </p>
 
 ---
@@ -141,7 +141,7 @@
 员工账号可查看个人相关的客户、订单、跟进等数据分析仪表盘。
 
 <p align="center">
-  <img alt="员工数据分析仪表盘" src="6.png" width="90%">
+  <img alt="员工数据分析仪表盘" src="image/6.png" width="90%">
 </p>
 
 ---
@@ -151,7 +151,7 @@
 AI 助手拓展页面，提供更丰富的对话交互与智能分析能力。
 
 <p align="center">
-  <img alt="AI助手拓展页面" src="7.png" width="90%">
+  <img alt="AI助手拓展页面" src="image/7.png" width="90%">
 </p>
 
 ---
