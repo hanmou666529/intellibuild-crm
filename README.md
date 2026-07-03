@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="logo" src="image/logo.png" width="80">
+  <img alt="logo" src="image/logo1.png" width="80">
 </p>
 <h1 align="center">智营 CRM · IntelliBuild CRM</h1>
 <p align="center">
