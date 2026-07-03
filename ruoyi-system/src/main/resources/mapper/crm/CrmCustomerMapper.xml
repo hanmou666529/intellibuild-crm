@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmCustomerMapper">
+
+    <resultMap type="CrmCustomer" id="CrmCustomerResult">
+        <id     property="customerId"      column="customer_id"        />
+        <result property="customerName"    column="customer_name"      />
+        <result property="phone"           column="phone"              />
+        <result property="sex"             column="sex"                />
+        <result property="source"          column="source"             />
+        <result property="level"           column="level"              />
+        <result property="industry"        column="industry"           />
+        <result property="tags"            column="tags"               />
+        <result property="followStatus"    column="follow_status"      />
+        <result property="nextContactTime" column="next_contact_time"  />
+        <result property="belongUserId"    column="belong_user_id"     />
+        <result property="belongDeptId"    column="belong_dept_id"     />
+        <result property="isPool"          column="is_pool"            />
+        <result property="enterPoolTime"   column="enter_pool_time"    />
+        <result property="lastFollowTime"  column="last_follow_time"   />
+        <result property="address"         column="address"            />
+        <result property="email"           column="email"              />
+        <result property="company"         column="company"            />
+        <result property="position"        column="position"           />
+        <result property="wechat"          column="wechat"             />
+        <result property="qq"              column="qq"                 />
+        <result property="delFlag"         column="del_flag"           />
+        <result property="createBy"        column="create_by"          />
+        <result property="createTime"      column="create_time"        />
+        <result property="updateBy"        column="update_by"          />
+        <result property="updateTime"      column="update_time"        />
+        <result property="remark"          column="remark"             />
+        <result property="belongUserName"  column="belong_user_name"   />
+        <result property="belongDeptName"  column="belong_dept_name"   />
+        <result property="shareFromDeptName" column="share_from_dept_name" />
+        <result property="shareActionDesc" column="share_action_desc" />
+        <result property="shareActionTime" column="share_action_time" />
+        <result property="orderNos"        column="order_nos"          />
+        <result property="contractNos"     column="contract_nos"       />
+    </resultMap>
+
+    <sql id="selectCrmCustomerVo">
+        select c.customer_id, c.customer_name, c.phone, c.sex, c.source, c.level, c.industry, c.tags,
+               c.follow_status, c.next_contact_time, c.belong_user_id, c.belong_dept_id, c.is_pool,
+               c.enter_pool_time, c.last_follow_time, c.address, c.email, c.company, c.position,
+               c.wechat, c.qq, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               u.user_name as belong_user_name,
+               d.dept_name as belong_dept_name
+        from crm_customer c
+        left join sys_user u on c.belong_user_id = u.user_id
+        left join sys_dept d on c.belong_dept_id = d.dept_id
+    </sql>
+
+
+
+    <select id="selectCrmCustomerList" parameterType="CrmCustomer" resultMap="CrmCustomerResult">
+        select c.customer_id, c.customer_name, c.phone, c.sex, c.source, c.level, c.industry, c.tags,
+               c.follow_status, c.next_contact_time, c.belong_user_id, c.belong_dept_id, c.is_pool,
+               c.enter_pool_time, c.last_follow_time, c.address, c.email, c.company, c.position,
+               c.wechat, c.qq, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               u.user_name as belong_user_name,
+               d.dept_name as belong_dept_name,
+               (select d2.dept_name from crm_customer_share cs
+                left join sys_user u2 on cs.from_user_id = u2.user_id
+                left join sys_dept d2 on u2.dept_id = d2.dept_id
+                where cs.customer_id = c.customer_id
+                   and cs.del_flag = '0'
+                   and cs.to_user_id = #{params.currentUserId}
+                   and (cs.expire_time is null or cs.expire_time > now())
+                limit 1) as share_from_dept_name,
+                (select case
+                   when cs2.to_user_id is not null then concat('已分配至 ', u3.nick_name)
+                   when cs2.to_dept_id is not null then concat('已共享至 ', d3.dept_name)
+                   else ''
+                 end
+                 from crm_customer_share cs2
+                 left join sys_user u3 on cs2.to_user_id = u3.user_id
+                 left join sys_dept d3 on cs2.to_dept_id = d3.dept_id
+                 where cs2.customer_id = c.customer_id
+                   and cs2.del_flag = '0'
+                   and cs2.from_user_id = #{params.currentUserId}
+                   and (cs2.expire_time is null or cs2.expire_time > now())
+                 order by cs2.create_time desc
+                 limit 1) as share_action_desc,
+                (select cs3.create_time
+                 from crm_customer_share cs3
+                 where cs3.customer_id = c.customer_id
+                   and cs3.del_flag = '0'
+                   and cs3.from_user_id = #{params.currentUserId}
+                   and (cs3.expire_time is null or cs3.expire_time > now())
+                 order by cs3.create_time desc
+                 limit 1) as share_action_time,
+                (select group_concat(distinct o2.order_no order by o2.create_time desc separator ', ')
+                 from crm_order o2 where o2.customer_id = c.customer_id and o2.del_flag = '0') as order_nos,
+                (select group_concat(distinct ct.contract_no order by ct.create_time desc separator ', ')
+                 from crm_contract ct where ct.customer_id = c.customer_id and ct.del_flag = '0') as contract_nos
+        from crm_customer c
+        left join sys_user u on c.belong_user_id = u.user_id
+        left join sys_dept d on c.belong_dept_id = d.dept_id
+        where c.del_flag = '0'
+        <if test="customerId != null">
+            AND c.customer_id = #{customerId}
+        </if>
+        <if test="customerName != null and customerName != ''">
+            AND c.customer_name like concat('%', #{customerName}, '%')
+        </if>
+        <if test="phone != null and phone != ''">
+            AND c.phone like concat('%', #{phone}, '%')
+        </if>
+        <if test="sex != null and sex != ''">
+            AND c.sex = #{sex}
+        </if>
+        <if test="source != null and source != ''">
+            AND c.source = #{source}
+        </if>
+        <if test="level != null and level != ''">
+            AND c.level = #{level}
+        </if>
+        <if test="industry != null and industry != ''">
+            AND c.industry like concat('%', #{industry}, '%')
+        </if>
+        <if test="followStatus != null and followStatus != ''">
+            AND c.follow_status = #{followStatus}
+        </if>
+        <if test="tag != null and tag != ''">
+            AND FIND_IN_SET(#{tag}, c.tags)
+        </if>
+        <if test="isPool != null and isPool != ''">
+            AND c.is_pool = #{isPool}
+        </if>
+        <if test="isPool == null or isPool == ''">
+            AND c.is_pool = '0'
+        </if>
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        <if test="belongUserId != null">
+            AND c.belong_user_id = #{belongUserId}
+        </if>
+        <if test="belongDeptId != null">
+            AND c.belong_dept_id = #{belongDeptId}
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND date_format(c.create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            AND date_format(c.create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+        </if>
+        order by FIELD(c.level, 'high', 'medium', 'low', 'won'), c.create_time desc
+    </select>
+
+    <select id="selectCrmCustomerById" parameterType="Long" resultMap="CrmCustomerResult">
+        select c.customer_id, c.customer_name, c.phone, c.sex, c.source, c.level, c.industry, c.tags,
+               c.follow_status, c.next_contact_time, c.belong_user_id, c.belong_dept_id, c.is_pool,
+               c.enter_pool_time, c.last_follow_time, c.address, c.email, c.company, c.position,
+               c.wechat, c.qq, c.del_flag, c.create_by, c.create_time, c.update_by, c.update_time, c.remark,
+               u.user_name as belong_user_name,
+               d.dept_name as belong_dept_name,
+               (select case
+                  when cs2.to_user_id is not null then concat('已分配至 ', u3.nick_name)
+                  when cs2.to_dept_id is not null then concat('已共享至 ', d3.dept_name)
+                  else ''
+                end
+                from crm_customer_share cs2
+                left join sys_user u3 on cs2.to_user_id = u3.user_id
+                left join sys_dept d3 on cs2.to_dept_id = d3.dept_id
+                where cs2.customer_id = c.customer_id
+                  and cs2.del_flag = '0'
+                  and cs2.from_user_id = #{params.currentUserId}
+                  and (cs2.expire_time is null or cs2.expire_time > now())
+                order by cs2.create_time desc
+                limit 1) as share_action_desc,
+               (select cs3.create_time
+                from crm_customer_share cs3
+                where cs3.customer_id = c.customer_id
+                  and cs3.del_flag = '0'
+                  and cs3.from_user_id = #{params.currentUserId}
+                  and (cs3.expire_time is null or cs3.expire_time > now())
+                order by cs3.create_time desc
+                limit 1) as share_action_time
+        from crm_customer c
+        left join sys_user u on c.belong_user_id = u.user_id
+        left join sys_dept d on c.belong_dept_id = d.dept_id
+        where c.customer_id = #{customerId}
+    </select>
+
+    <select id="checkPhoneUnique" parameterType="String" resultMap="CrmCustomerResult">
+        <include refid="selectCrmCustomerVo"/>
+        where c.phone = #{phone} and c.del_flag = '0' limit 1
+    </select>
+
+    <select id="checkCustomerNameUnique" parameterType="String" resultMap="CrmCustomerResult">
+        <include refid="selectCrmCustomerVo"/>
+        where c.customer_name = #{customerName} and c.del_flag = '0' limit 1
+    </select>
+
+    <insert id="insertCrmCustomer" parameterType="CrmCustomer" useGeneratedKeys="true" keyProperty="customerId">
+        insert into crm_customer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerId != null">customer_id,</if>
+            <if test="customerName != null and customerName != ''">customer_name,</if>
+            <if test="phone != null and phone != ''">phone,</if>
+            <if test="sex != null and sex != ''">sex,</if>
+            <if test="source != null and source != ''">source,</if>
+            <if test="level != null and level != ''">level,</if>
+            <if test="industry != null and industry != ''">industry,</if>
+            <if test="tags != null and tags != ''">tags,</if>
+            <if test="followStatus != null and followStatus != ''">follow_status,</if>
+            <if test="nextContactTime != null">next_contact_time,</if>
+            <if test="belongUserId != null">belong_user_id,</if>
+            <if test="belongDeptId != null">belong_dept_id,</if>
+            <if test="isPool != null and isPool != ''">is_pool,</if>
+            <if test="enterPoolTime != null">enter_pool_time,</if>
+            <if test="lastFollowTime != null">last_follow_time,</if>
+            <if test="address != null and address != ''">address,</if>
+            <if test="email != null and email != ''">email,</if>
+            <if test="company != null and company != ''">company,</if>
+            <if test="position != null and position != ''">position,</if>
+            <if test="wechat != null and wechat != ''">wechat,</if>
+            <if test="qq != null and qq != ''">qq,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerId != null">#{customerId},</if>
+            <if test="customerName != null and customerName != ''">#{customerName},</if>
+            <if test="phone != null and phone != ''">#{phone},</if>
+            <if test="sex != null and sex != ''">#{sex},</if>
+            <if test="source != null and source != ''">#{source},</if>
+            <if test="level != null and level != ''">#{level},</if>
+            <if test="industry != null and industry != ''">#{industry},</if>
+            <if test="tags != null and tags != ''">#{tags},</if>
+            <if test="followStatus != null and followStatus != ''">#{followStatus},</if>
+            <if test="nextContactTime != null">#{nextContactTime},</if>
+            <if test="belongUserId != null">#{belongUserId},</if>
+            <if test="belongDeptId != null">#{belongDeptId},</if>
+            <if test="isPool != null and isPool != ''">#{isPool},</if>
+            <if test="enterPoolTime != null">#{enterPoolTime},</if>
+            <if test="lastFollowTime != null">#{lastFollowTime},</if>
+            <if test="address != null and address != ''">#{address},</if>
+            <if test="email != null and email != ''">#{email},</if>
+            <if test="company != null and company != ''">#{company},</if>
+            <if test="position != null and position != ''">#{position},</if>
+            <if test="wechat != null and wechat != ''">#{wechat},</if>
+            <if test="qq != null and qq != ''">#{qq},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmCustomer" parameterType="CrmCustomer">
+        update crm_customer
+        <set>
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="sex != null">sex = #{sex},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="level != null">level = #{level},</if>
+            <if test="industry != null">industry = #{industry},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="followStatus != null">follow_status = #{followStatus},</if>
+            <if test="nextContactTime != null">next_contact_time = #{nextContactTime},</if>
+            <if test="belongUserId != null">belong_user_id = #{belongUserId},</if>
+            <if test="belongDeptId != null">belong_dept_id = #{belongDeptId},</if>
+            <if test="isPool != null">is_pool = #{isPool},</if>
+            <if test="enterPoolTime != null">enter_pool_time = #{enterPoolTime},</if>
+            <if test="lastFollowTime != null">last_follow_time = #{lastFollowTime},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="company != null">company = #{company},</if>
+            <if test="position != null">position = #{position},</if>
+            <if test="wechat != null">wechat = #{wechat},</if>
+            <if test="qq != null">qq = #{qq},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where customer_id = #{customerId}
+    </update>
+
+    <update id="deleteCrmCustomerByIds" parameterType="String">
+        update crm_customer set del_flag = '2' where customer_id in
+        <foreach collection="array" item="customerId" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
+    </update>
+
+    <update id="updateCustomerBelong" parameterType="CrmCustomer">
+        update crm_customer
+        <set>
+            <if test="belongUserId != null">belong_user_id = #{belongUserId},</if>
+            <if test="belongDeptId != null">belong_dept_id = #{belongDeptId},</if>
+            is_pool = '0',
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where customer_id = #{customerId}
+    </update>
+
+    <update id="putToPool" parameterType="CrmCustomer">
+        update crm_customer
+        set belong_user_id = null,
+            belong_dept_id = null,
+            is_pool = '1',
+            enter_pool_time = sysdate(),
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        where customer_id = #{customerId}
+    </update>
+
+    <update id="claimFromPool" parameterType="CrmCustomer">
+        update crm_customer
+        set belong_user_id = #{belongUserId},
+            belong_dept_id = #{belongDeptId},
+            is_pool = '0',
+            enter_pool_time = null,
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        where customer_id = #{customerId}
+    </update>
+
+    <select id="countTotal" parameterType="CrmCustomer" resultType="Integer">
+        select count(1) from crm_customer c where c.del_flag = '0'
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+    </select>
+
+    <select id="countTodayNew" parameterType="CrmCustomer" resultType="Integer">
+        select count(1) from crm_customer c
+        where c.del_flag = '0'
+        and (date_format(c.create_time, '%Y-%m-%d') = #{params.today}
+             or date_format(c.update_time, '%Y-%m-%d') = #{params.today})
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+    </select>
+
+    <select id="countPendingFollowup" parameterType="CrmCustomer" resultType="Integer">
+        select count(1) from crm_customer c
+        where c.del_flag = '0' and c.follow_status = 'pending'
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+    </select>
+
+    <select id="countGroupBySource" parameterType="CrmCustomer" resultType="java.util.Map">
+        select c.source as name, count(1) as value
+        from crm_customer c where c.del_flag = '0' and c.source is not null and c.source != ''
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        group by c.source
+    </select>
+
+    <select id="countGroupByLevel" parameterType="CrmCustomer" resultType="java.util.Map">
+        select c.level as name, count(1) as value
+        from crm_customer c where c.del_flag = '0' and c.level is not null and c.level != ''
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        group by c.level
+    </select>
+
+    <select id="countMonthNewCustomers" parameterType="CrmCustomer" resultType="java.util.Map">
+        SELECT DATE_FORMAT(c.create_time, '%Y-%m') AS month, COUNT(1) AS cnt
+        FROM crm_customer c
+        WHERE c.del_flag = '0'
+          AND c.create_time &gt;= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01')
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        GROUP BY month
+        ORDER BY month
+    </select>
+
+    <select id="checkDuplicate" parameterType="CrmCustomer" resultMap="CrmCustomerResult">
+        <include refid="selectCrmCustomerVo"/>
+        where c.del_flag = '0'
+          and (
+              <if test="customerName != null and customerName != ''"> c.customer_name = #{customerName} or</if>
+              <if test="phone != null and phone != ''"> c.phone = #{phone} or</if>
+              <if test="email != null and email != ''"> c.email = #{email} or</if>
+              <if test="company != null and company != ''"> c.company = #{company} or</if>
+              1=0
+          )
+        limit 5
+    </select>
+
+    <update id="deleteByMerge">
+        update crm_customer set del_flag = '3', merge_to_id = #{mergeToId}, update_time = sysdate()
+        where customer_id = #{customerId}
+    </update>
+
+</mapper>

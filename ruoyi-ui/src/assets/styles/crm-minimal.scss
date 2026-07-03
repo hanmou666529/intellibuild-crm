@@ -1,0 +1,255 @@
+/* ─── Black & White Minimal Global Overrides ─── */
+
+* {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html, body, #app {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* ─── Element UI Overrides ─── */
+
+.el-button {
+  border-radius: 9999px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+}
+.el-button--primary {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+.el-button--primary:hover {
+  background: #333333 !important;
+  border-color: #333333 !important;
+}
+.el-button--default {
+  background: transparent !important;
+  border-color: rgba(0,0,0,0.35) !important;
+  color: #000000 !important;
+}
+.el-button--default:hover {
+  border-color: #000000 !important;
+}
+.el-button--text {
+  color: rgba(0,0,0,0.55) !important;
+}
+.el-button--text:hover {
+  color: #000000 !important;
+}
+.el-button--small {
+  padding: 7px 16px !important;
+  font-size: 13px !important;
+}
+
+.el-table {
+  border: none !important;
+  font-size: 13px !important;
+}
+.el-table::before {
+  display: none !important;
+}
+.el-table th.el-table__cell {
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e5e5 !important;
+  color: rgba(0,0,0,0.45) !important;
+  font-weight: 500 !important;
+  font-size: 11px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+.el-table td.el-table__cell {
+  border-bottom: 1px solid #f0f0f0 !important;
+  color: #000000 !important;
+}
+.el-table__row:hover td.el-table__cell {
+  background: #fafafa !important;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: #f8f8f8 !important;
+}
+
+.el-input__inner {
+  border-radius: 9999px !important;
+  border-color: rgba(0,0,0,0.15) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  height: 38px !important;
+  line-height: 38px !important;
+  padding: 0 16px !important;
+}
+.el-input__inner:focus {
+  border-color: #000000 !important;
+}
+.el-input__prefix {
+  left: 14px !important;
+}
+.el-input--prefix .el-input__inner {
+  padding-left: 36px !important;
+}
+
+.el-form-item__label {
+  font-weight: 500 !important;
+  color: #000000 !important;
+  font-size: 13px !important;
+}
+
+.el-card {
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  background: #ffffff !important;
+}
+
+.el-tag {
+  border-radius: 9999px !important;
+  border: 1px solid rgba(0,0,0,0.12) !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  padding: 0 12px !important;
+  height: 26px !important;
+  line-height: 24px !important;
+}
+.el-tag--danger {
+  border-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.el-pagination {
+  padding: 16px 0 !important;
+  font-weight: 400 !important;
+}
+.el-pagination button, .el-pagination .el-pager li {
+  background: transparent !important;
+  border-radius: 9999px !important;
+  font-weight: 500 !important;
+}
+
+/* ─── Transitions & Animations ─── */
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.anim-navbar {
+  animation: fadeSlideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.anim-title {
+  animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.anim-subtitle {
+  animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.anim-content {
+  animation: fadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.anim-video {
+  animation: scaleIn 1.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.delay-1 { animation-delay: 0.6s; }
+.delay-2 { animation-delay: 0.8s; }
+.delay-3 { animation-delay: 1.0s; }
+.delay-4 { animation-delay: 1.2s; }
+.delay-5 { animation-delay: 1.4s; }
+
+/* ─── Module Accent Colors ─── */
+
+.mod-dashboard { --accent: #0052D9; --accent-light: rgba(0,82,217,0.08); }
+.mod-customer  { --accent: #00A86B; --accent-light: rgba(0,168,107,0.08); }
+.mod-followup  { --accent: #FF6B35; --accent-light: rgba(255,107,53,0.08); }
+.mod-order     { --accent: #7C3AED; --accent-light: rgba(124,58,237,0.08); }
+.mod-contract  { --accent: #0891B2; --accent-light: rgba(8,145,178,0.08); }
+.mod-payment   { --accent: #D97706; --accent-light: rgba(217,119,6,0.08); }
+.mod-product   { --accent: #DC2626; --accent-light: rgba(220,38,38,0.08); }
+.mod-category  { --accent: #0D9488; --accent-light: rgba(13,148,136,0.08); }
+.mod-pool      { --accent: #4F46E5; --accent-light: rgba(79,70,229,0.08); }
+.mod-pipeline  { --accent: #0D9488; --accent-light: rgba(13,148,136,0.08); }
+.mod-notification { --accent: #E11D48; --accent-light: rgba(225,29,72,0.08); }
+
+/* ─── Page Top Accent Bar ─── */
+
+.page-accent {
+  border-top: 3px solid var(--accent, #000) !important;
+}
+
+/* ─── Accent dot for list items ─── */
+
+.accent-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: var(--accent, #000);
+}
+
+/* ─── Card with colored left border ─── */
+
+.card-accent {
+  border-left: 3px solid var(--accent, #000) !important;
+}
+
+/* ─── Utility ─── */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: all 0.2s ease;
+}
+.pill-light {
+  background: #f4f4f6;
+  color: #000;
+  border: none;
+}
+.pill-border {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  color: #000;
+}
+.pill-black {
+  background: #000;
+  color: #fff;
+  border: none;
+}
+.pill-btn {
+  cursor: pointer;
+}
+.pill-btn:hover {
+  opacity: 0.75;
+}
+
+/* ─── Sidebar ─── */
+
+.el-menu--vertical .el-menu-item:hover,
+.el-menu--vertical .el-submenu__title:hover {
+  background-color: #f5f5f5 !important;
+}
+.el-menu--vertical .el-menu-item.is-active {
+  color: #000 !important;
+  font-weight: 600;
+}

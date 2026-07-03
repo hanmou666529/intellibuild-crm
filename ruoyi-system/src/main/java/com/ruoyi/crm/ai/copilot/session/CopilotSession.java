@@ -1,0 +1,28 @@
+package com.ruoyi.crm.ai.copilot.session;
+
+import java.util.Date;
+import com.ruoyi.common.core.domain.BaseEntity;
+
+public class CopilotSession extends BaseEntity {
+    private static final long serialVersionUID = 1L;
+
+    private String sessionId;
+    private Long userId;
+    private String title;
+    private String context;
+    private Date createTime;
+    private Date updateTime;
+
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getContext() { return context; }
+    public void setContext(String context) { this.context = context; }
+    public Date getCreateTime() { return createTime; }
+    public void setCreateTime(Date createTime) { this.createTime = createTime; }
+    public Date getUpdateTime() { return updateTime; }
+    public void setUpdateTime(Date updateTime) { this.updateTime = updateTime; }
+}

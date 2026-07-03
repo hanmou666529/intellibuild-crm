@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmApprovalRequestMapper">
+
+    <resultMap type="CrmApprovalRequest" id="CrmApprovalRequestResult">
+        <id     property="requestId"    column="request_id"     />
+        <result property="templateId"   column="template_id"    />
+        <result property="bizType"      column="biz_type"       />
+        <result property="bizId"        column="biz_id"         />
+        <result property="bizInfo"      column="biz_info"       />
+        <result property="amount"       column="amount"         />
+        <result property="status"       column="status"         />
+        <result property="currentStep"  column="current_step"   />
+        <result property="submitBy"     column="submit_by"      />
+        <result property="submitName"   column="submit_name"    />
+        <result property="submitTime"   column="submit_time"    />
+        <result property="delFlag"      column="del_flag"       />
+        <result property="createBy"     column="create_by"      />
+        <result property="createTime"   column="create_time"    />
+        <result property="updateBy"     column="update_by"      />
+        <result property="updateTime"   column="update_time"    />
+        <result property="remark"       column="remark"         />
+    </resultMap>
+
+    <resultMap type="CrmApprovalRequest" id="CrmApprovalRequestWithTemplateResult" extends="CrmApprovalRequestResult">
+        <result property="templateName" column="template_name"  />
+    </resultMap>
+
+    <sql id="selectRequestVo">
+        select r.request_id, r.template_id, r.biz_type, r.biz_id, r.biz_info,
+               r.amount, r.status, r.current_step, r.submit_by, r.submit_name,
+               r.submit_time, r.del_flag, r.create_by, r.create_time,
+               r.update_by, r.update_time, r.remark,
+               t.template_name
+        from crm_approval_request r
+        left join crm_approval_template t on r.template_id = t.template_id
+    </sql>
+
+    <select id="selectCrmApprovalRequestList" parameterType="CrmApprovalRequest" resultMap="CrmApprovalRequestWithTemplateResult">
+        <include refid="selectRequestVo"/>
+        where r.del_flag = '0'
+        <if test="bizType != null and bizType != ''">
+            AND r.biz_type = #{bizType}
+        </if>
+        <if test="status != null and status != ''">
+            AND r.status = #{status}
+        </if>
+        <if test="submitBy != null and submitBy != ''">
+            AND r.submit_by = #{submitBy}
+        </if>
+        order by r.create_time desc
+    </select>
+
+    <select id="selectCrmApprovalRequestById" parameterType="Long" resultMap="CrmApprovalRequestWithTemplateResult">
+        <include refid="selectRequestVo"/>
+        where r.request_id = #{requestId}
+    </select>
+
+    <select id="selectProcessedRequests" resultMap="CrmApprovalRequestWithTemplateResult">
+        <include refid="selectRequestVo"/>
+        where r.del_flag = '0' and r.status in ('1', '2')
+        order by r.create_time desc
+    </select>
+
+    <select id="selectPendingByApproverId" parameterType="Long" resultMap="CrmApprovalRequestWithTemplateResult">
+        select distinct r.request_id, r.template_id, r.biz_type, r.biz_id, r.biz_info,
+               r.amount, r.status, r.current_step, r.submit_by, r.submit_name,
+               r.submit_time, r.del_flag, r.create_by, r.create_time,
+               r.update_by, r.update_time, r.remark,
+               t.template_name
+        from crm_approval_request r
+        left join crm_approval_template t on r.template_id = t.template_id
+        inner join crm_approval_node n on r.request_id = n.request_id
+        where r.del_flag = '0' and r.status = '0'
+          and n.status = '0' and n.step_order = r.current_step
+          and (n.approver_user_id = #{approverUserId} or n.approver_user_id is null)
+        order by r.create_time desc
+    </select>
+
+    <insert id="insertCrmApprovalRequest" parameterType="CrmApprovalRequest" useGeneratedKeys="true" keyProperty="requestId">
+        insert into crm_approval_request
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
+            <if test="bizType != null and bizType != ''">biz_type,</if>
+            <if test="bizId != null">biz_id,</if>
+            <if test="bizInfo != null and bizInfo != ''">biz_info,</if>
+            <if test="amount != null">amount,</if>
+            <if test="status != null">status,</if>
+            <if test="currentStep != null">current_step,</if>
+            <if test="submitBy != null">submit_by,</if>
+            <if test="submitName != null">submit_name,</if>
+            <if test="submitTime != null">submit_time,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
+            <if test="bizType != null and bizType != ''">#{bizType},</if>
+            <if test="bizId != null">#{bizId},</if>
+            <if test="bizInfo != null and bizInfo != ''">#{bizInfo},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="currentStep != null">#{currentStep},</if>
+            <if test="submitBy != null">#{submitBy},</if>
+            <if test="submitName != null">#{submitName},</if>
+            <if test="submitTime != null">#{submitTime},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmApprovalRequest" parameterType="CrmApprovalRequest">
+        update crm_approval_request
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="currentStep != null">current_step = #{currentStep},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where request_id = #{requestId}
+    </update>
+
+</mapper>

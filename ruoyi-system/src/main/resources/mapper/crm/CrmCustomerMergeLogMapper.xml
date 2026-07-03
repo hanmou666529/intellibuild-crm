@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmCustomerMergeLogMapper">
+
+    <resultMap type="CrmCustomerMergeLog" id="CrmCustomerMergeLogResult">
+        <result property="mergeId" column="merge_id"/>
+        <result property="keepCustomerId" column="keep_customer_id"/>
+        <result property="mergeCustomerId" column="merge_customer_id"/>
+        <result property="keepCustomerName" column="keep_customer_name"/>
+        <result property="mergeCustomerName" column="merge_customer_name"/>
+        <result property="mergedFields" column="merged_fields"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="CrmCustomerMergeLog" useGeneratedKeys="true" keyProperty="mergeId">
+        insert into crm_customer_merge_log (
+            keep_customer_id, merge_customer_id, keep_customer_name, merge_customer_name,
+            merged_fields, create_by, create_time
+        ) values (
+            #{keepCustomerId}, #{mergeCustomerId}, #{keepCustomerName}, #{mergeCustomerName},
+            #{mergedFields}, #{createBy}, sysdate()
+        )
+    </insert>
+
+    <select id="selectList" resultMap="CrmCustomerMergeLogResult">
+        select * from crm_customer_merge_log order by create_time desc
+    </select>
+
+</mapper>

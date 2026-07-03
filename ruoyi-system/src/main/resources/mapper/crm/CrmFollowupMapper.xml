@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmFollowupMapper">
+
+    <resultMap type="CrmFollowup" id="CrmFollowupResult">
+        <id     property="followupId"      column="followup_id"        />
+        <result property="customerId"      column="customer_id"        />
+        <result property="contactTime"     column="contact_time"       />
+        <result property="followupMode"    column="followup_mode"      />
+        <result property="content"         column="content"            />
+        <result property="nextContactTime" column="next_contact_time"  />
+        <result property="isEffective"     column="is_effective"       />
+        <result property="delFlag"         column="del_flag"           />
+        <result property="createBy"        column="create_by"          />
+        <result property="createTime"      column="create_time"        />
+        <result property="updateBy"        column="update_by"          />
+        <result property="updateTime"      column="update_time"        />
+        <result property="customerName"    column="customer_name"      />
+    </resultMap>
+
+    <sql id="selectCrmFollowupVo">
+        select f.followup_id, f.customer_id, f.contact_time, f.followup_mode, f.content,
+               f.next_contact_time, f.is_effective, f.del_flag, f.create_by, f.create_time,
+               f.update_by, f.update_time, c.customer_name
+        from crm_followup f
+        left join crm_customer c on f.customer_id = c.customer_id
+    </sql>
+
+    <select id="selectCrmFollowupList" parameterType="CrmFollowup" resultMap="CrmFollowupResult">
+        <include refid="selectCrmFollowupVo"/>
+        where f.del_flag = '0'
+        <if test="customerId != null">
+            AND f.customer_id = #{customerId}
+        </if>
+        <if test="followupMode != null and followupMode != ''">
+            AND f.followup_mode = #{followupMode}
+        </if>
+        <if test="isEffective != null and isEffective != ''">
+            AND f.is_effective = #{isEffective}
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND date_format(f.contact_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            AND date_format(f.contact_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+        </if>
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        order by f.contact_time desc
+    </select>
+
+    <select id="selectCrmFollowupById" parameterType="Long" resultMap="CrmFollowupResult">
+        <include refid="selectCrmFollowupVo"/>
+        where f.followup_id = #{followupId}
+    </select>
+
+    <select id="selectCrmFollowupByCustomerId" parameterType="Long" resultMap="CrmFollowupResult">
+        <include refid="selectCrmFollowupVo"/>
+        where f.customer_id = #{customerId} and f.del_flag = '0'
+        order by f.contact_time desc
+    </select>
+
+    <insert id="insertCrmFollowup" parameterType="CrmFollowup" useGeneratedKeys="true" keyProperty="followupId">
+        insert into crm_followup
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="followupId != null">followup_id,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="contactTime != null">contact_time,</if>
+            <if test="followupMode != null and followupMode != ''">followup_mode,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="nextContactTime != null">next_contact_time,</if>
+            <if test="isEffective != null and isEffective != ''">is_effective,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="followupId != null">#{followupId},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="contactTime != null">#{contactTime},</if>
+            <if test="followupMode != null and followupMode != ''">#{followupMode},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="nextContactTime != null">#{nextContactTime},</if>
+            <if test="isEffective != null and isEffective != ''">#{isEffective},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmFollowup" parameterType="CrmFollowup">
+        update crm_followup
+        <set>
+            <if test="customerId != null">customer_id = #{customerId},</if>
+            <if test="contactTime != null">contact_time = #{contactTime},</if>
+            <if test="followupMode != null">followup_mode = #{followupMode},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="nextContactTime != null">next_contact_time = #{nextContactTime},</if>
+            <if test="isEffective != null">is_effective = #{isEffective},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            update_time = sysdate()
+        </set>
+        where followup_id = #{followupId}
+    </update>
+
+    <update id="deleteCrmFollowupByIds" parameterType="String">
+        update crm_followup set del_flag = '2' where followup_id in
+        <foreach collection="array" item="followupId" open="(" separator="," close=")">
+            #{followupId}
+        </foreach>
+    </update>
+
+    <select id="countFollowupTrend" parameterType="java.util.Map" resultType="java.util.Map">
+        select date_format(create_time, '%Y-%m-%d') as date, count(1) as count
+        from crm_followup
+        where del_flag = '0' and create_time &gt;= #{startDate} and create_time &lt;= #{endDate}
+        group by date_format(create_time, '%Y-%m-%d')
+        order by date
+    </select>
+
+    <update id="updateCustomerId">
+        update crm_followup set customer_id = #{newId}, update_time = sysdate()
+        where customer_id = #{oldId}
+    </update>
+
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmProductCategoryMapper">
+
+    <resultMap type="CrmProductCategory" id="CrmProductCategoryResult">
+        <id     property="categoryId"      column="category_id"        />
+        <result property="parentId"        column="parent_id"          />
+        <result property="categoryName"    column="category_name"      />
+        <result property="orderNum"        column="order_num"          />
+        <result property="createBy"        column="create_by"          />
+        <result property="createTime"      column="create_time"        />
+        <result property="updateBy"        column="update_by"          />
+        <result property="updateTime"      column="update_time"        />
+        <result property="remark"          column="remark"             />
+    </resultMap>
+
+    <sql id="selectCrmProductCategoryVo">
+        select c.category_id, c.parent_id, c.category_name, c.order_num,
+               c.create_by, c.create_time, c.update_by, c.update_time, c.remark
+        from crm_product_category c
+    </sql>
+
+    <select id="selectCrmProductCategoryList" parameterType="CrmProductCategory" resultMap="CrmProductCategoryResult">
+        <include refid="selectCrmProductCategoryVo"/>
+        order by c.order_num asc
+    </select>
+
+    <select id="selectCrmProductCategoryById" parameterType="Long" resultMap="CrmProductCategoryResult">
+        <include refid="selectCrmProductCategoryVo"/>
+        where c.category_id = #{categoryId}
+    </select>
+
+    <insert id="insertCrmProductCategory" parameterType="CrmProductCategory" useGeneratedKeys="true" keyProperty="categoryId">
+        insert into crm_product_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">category_id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="categoryName != null and categoryName != ''">category_name,</if>
+            <if test="orderNum != null">order_num,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="categoryName != null and categoryName != ''">#{categoryName},</if>
+            <if test="orderNum != null">#{orderNum},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmProductCategory" parameterType="CrmProductCategory">
+        update crm_product_category
+        <set>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="categoryName != null">category_name = #{categoryName},</if>
+            <if test="orderNum != null">order_num = #{orderNum},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where category_id = #{categoryId}
+    </update>
+
+    <delete id="deleteCrmProductCategoryById" parameterType="Long">
+        delete from crm_product_category where category_id = #{categoryId}
+    </delete>
+
+    <delete id="deleteCrmProductCategoryByIds" parameterType="String">
+        delete from crm_product_category where category_id in
+        <foreach collection="array" item="categoryId" open="(" separator="," close=")">
+            #{categoryId}
+        </foreach>
+    </delete>
+
+</mapper>

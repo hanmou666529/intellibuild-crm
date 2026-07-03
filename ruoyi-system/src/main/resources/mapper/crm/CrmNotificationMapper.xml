@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmNotificationMapper">
+
+    <resultMap type="CrmNotification" id="CrmNotificationResult">
+        <id     property="notificationId"  column="notification_id"    />
+        <result property="title"           column="title"              />
+        <result property="content"         column="content"            />
+        <result property="type"            column="type"               />
+        <result property="toUserId"        column="to_user_id"         />
+        <result property="toDeptId"        column="to_dept_id"         />
+        <result property="bizType"         column="biz_type"           />
+        <result property="bizId"           column="biz_id"             />
+        <result property="isRead"          column="is_read"            />
+        <result property="readTime"        column="read_time"          />
+        <result property="delFlag"         column="del_flag"           />
+        <result property="createBy"        column="create_by"          />
+        <result property="createTime"      column="create_time"        />
+        <result property="updateBy"        column="update_by"          />
+        <result property="updateTime"      column="update_time"        />
+        <result property="remark"          column="remark"             />
+    </resultMap>
+
+    <sql id="selectCrmNotificationVo">
+        select n.notification_id, n.title, n.content, n.type, n.to_user_id, n.to_dept_id,
+               n.biz_type, n.biz_id, n.is_read, n.read_time,
+               n.del_flag, n.create_by, n.create_time, n.update_by, n.update_time, n.remark
+        from crm_notification n
+    </sql>
+
+    <select id="selectCrmNotificationList" parameterType="CrmNotification" resultMap="CrmNotificationResult">
+        <include refid="selectCrmNotificationVo"/>
+        where n.del_flag = '0'
+        <if test="toUserId != null">
+            AND n.to_user_id = #{toUserId}
+        </if>
+        <if test="type != null and type != ''">
+            AND n.type = #{type}
+        </if>
+        <if test="isRead != null and isRead != ''">
+            AND n.is_read = #{isRead}
+        </if>
+        <if test="bizType != null and bizType != ''">
+            AND n.biz_type = #{bizType}
+        </if>
+        order by n.create_time desc
+    </select>
+
+    <select id="selectCrmNotificationById" parameterType="Long" resultMap="CrmNotificationResult">
+        <include refid="selectCrmNotificationVo"/>
+        where n.notification_id = #{notificationId}
+    </select>
+
+    <select id="selectUnreadCountByUserId" parameterType="Long" resultType="int">
+        select count(1) from crm_notification
+        where to_user_id = #{userId} and is_read = '0' and del_flag = '0'
+    </select>
+
+    <insert id="insertCrmNotification" parameterType="CrmNotification" useGeneratedKeys="true" keyProperty="notificationId">
+        insert into crm_notification
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="notificationId != null">notification_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="type != null and type != ''">type,</if>
+            <if test="toUserId != null">to_user_id,</if>
+            <if test="toDeptId != null">to_dept_id,</if>
+            <if test="bizType != null and bizType != ''">biz_type,</if>
+            <if test="bizId != null">biz_id,</if>
+            <if test="isRead != null and isRead != ''">is_read,</if>
+            <if test="readTime != null">read_time,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="notificationId != null">#{notificationId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="type != null and type != ''">#{type},</if>
+            <if test="toUserId != null">#{toUserId},</if>
+            <if test="toDeptId != null">#{toDeptId},</if>
+            <if test="bizType != null and bizType != ''">#{bizType},</if>
+            <if test="bizId != null">#{bizId},</if>
+            <if test="isRead != null and isRead != ''">#{isRead},</if>
+            <if test="readTime != null">#{readTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmNotification" parameterType="CrmNotification">
+        update crm_notification
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="toUserId != null">to_user_id = #{toUserId},</if>
+            <if test="toDeptId != null">to_dept_id = #{toDeptId},</if>
+            <if test="bizType != null">biz_type = #{bizType},</if>
+            <if test="bizId != null">biz_id = #{bizId},</if>
+            <if test="isRead != null">is_read = #{isRead},</if>
+            <if test="readTime != null">read_time = #{readTime},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where notification_id = #{notificationId}
+    </update>
+
+    <update id="deleteCrmNotificationByIds" parameterType="String">
+        update crm_notification set del_flag = '2' where notification_id in
+        <foreach collection="array" item="notificationId" open="(" separator="," close=")">
+            #{notificationId}
+        </foreach>
+    </update>
+
+    <update id="markAsRead" parameterType="CrmNotification">
+        update crm_notification
+        set is_read = '1',
+            read_time = sysdate(),
+            update_time = sysdate()
+        where notification_id = #{notificationId}
+    </update>
+
+</mapper>

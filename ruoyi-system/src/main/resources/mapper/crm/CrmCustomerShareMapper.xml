@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmCustomerShareMapper">
+
+    <resultMap type="CrmCustomerShare" id="CrmCustomerShareResult">
+        <id     property="shareId"       column="share_id"       />
+        <result property="customerId"    column="customer_id"    />
+        <result property="fromUserId"    column="from_user_id"   />
+        <result property="toUserId"      column="to_user_id"     />
+        <result property="toDeptId"      column="to_dept_id"     />
+        <result property="shareType"     column="share_type"     />
+        <result property="expireTime"    column="expire_time"    />
+        <result property="delFlag"       column="del_flag"       />
+        <result property="createBy"      column="create_by"      />
+        <result property="createTime"    column="create_time"    />
+        <result property="customerName"  column="customer_name"  />
+    </resultMap>
+
+    <sql id="selectCrmCustomerShareVo">
+        select s.share_id, s.customer_id, s.from_user_id, s.to_user_id, s.to_dept_id,
+               s.share_type, s.expire_time, s.del_flag, s.create_by, s.create_time,
+               c.customer_name
+        from crm_customer_share s
+        left join crm_customer c on s.customer_id = c.customer_id
+    </sql>
+
+    <select id="selectCrmCustomerShareList" parameterType="CrmCustomerShare" resultMap="CrmCustomerShareResult">
+        <include refid="selectCrmCustomerShareVo"/>
+        where s.del_flag = '0'
+        <if test="customerId != null">
+            AND s.customer_id = #{customerId}
+        </if>
+        <if test="fromUserId != null">
+            AND s.from_user_id = #{fromUserId}
+        </if>
+        <if test="toUserId != null">
+            AND s.to_user_id = #{toUserId}
+        </if>
+        <if test="toDeptId != null">
+            AND s.to_dept_id = #{toDeptId}
+        </if>
+        <if test="shareType != null and shareType != ''">
+            AND s.share_type = #{shareType}
+        </if>
+    </select>
+
+    <select id="selectByCustomerId" parameterType="Long" resultMap="CrmCustomerShareResult">
+        <include refid="selectCrmCustomerShareVo"/>
+        where s.del_flag = '0' and s.customer_id = #{customerId}
+    </select>
+
+    <select id="selectSharedCustomerIdsByUser" parameterType="Long" resultType="Long">
+        select distinct s.customer_id
+        from crm_customer_share s
+        where s.del_flag = '0'
+          and s.to_user_id = #{userId}
+          and (s.expire_time is null or s.expire_time > now())
+    </select>
+
+    <select id="selectSharedCustomerIdsByDept" parameterType="Long" resultType="Long">
+        select distinct s.customer_id
+        from crm_customer_share s
+        where s.del_flag = '0'
+          and s.to_dept_id = #{deptId}
+          and (s.expire_time is null or s.expire_time > now())
+    </select>
+
+    <insert id="insertCrmCustomerShare" parameterType="CrmCustomerShare" useGeneratedKeys="true" keyProperty="shareId">
+        insert into crm_customer_share
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="customerId != null">customer_id,</if>
+            <if test="fromUserId != null">from_user_id,</if>
+            <if test="toUserId != null">to_user_id,</if>
+            <if test="toDeptId != null">to_dept_id,</if>
+            <if test="shareType != null and shareType != ''">share_type,</if>
+            <if test="expireTime != null">expire_time,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="customerId != null">#{customerId},</if>
+            <if test="fromUserId != null">#{fromUserId},</if>
+            <if test="toUserId != null">#{toUserId},</if>
+            <if test="toDeptId != null">#{toDeptId},</if>
+            <if test="shareType != null and shareType != ''">#{shareType},</if>
+            <if test="expireTime != null">#{expireTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="deleteCrmCustomerShareById" parameterType="Long">
+        update crm_customer_share set del_flag = '1' where share_id = #{shareId}
+    </update>
+
+    <update id="deleteByCustomerId" parameterType="Long">
+        update crm_customer_share set del_flag = '1' where customer_id = #{customerId}
+    </update>
+
+    <update id="updateCustomerId">
+        update crm_customer_share set customer_id = #{newId}
+        where customer_id = #{oldId}
+    </update>
+
+    <select id="selectDeptPendingShares" resultMap="CrmCustomerShareResult">
+        <include refid="selectCrmCustomerShareVo"/>
+        where s.del_flag = '0'
+          and s.to_dept_id = #{deptId}
+          and (s.expire_time is null or s.expire_time > now())
+        order by s.create_time desc
+    </select>
+
+</mapper>

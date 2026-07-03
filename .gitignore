@@ -1,0 +1,37 @@
+# Java
+*.class
+*.jar
+*.war
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env.local
+.env.*.local
+*.log
+
+# Maven
+maven-repository/
+
+# Temp files
+err.txt
+log.txt
+batch_output.txt
+charset.txt
+verify_result.txt

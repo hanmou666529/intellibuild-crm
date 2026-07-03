@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmOrderMapper">
+
+    <resultMap type="CrmOrder" id="CrmOrderResult">
+        <id     property="orderId"         column="order_id"           />
+        <result property="orderNo"         column="order_no"           />
+        <result property="customerId"      column="customer_id"        />
+        <result property="contractId"      column="contract_id"        />
+        <result property="totalAmount"     column="total_amount"       />
+        <result property="discountAmount"  column="discount_amount"    />
+        <result property="actualAmount"    column="actual_amount"      />
+        <result property="status"          column="status"             />
+        <result property="paidAmount"      column="paid_amount"        />
+        <result property="paymentCount"    column="payment_count"      />
+        <result property="lastPaymentTime" column="last_payment_time"  />
+        <result property="source"          column="source"             />
+        <result property="delFlag"         column="del_flag"           />
+        <result property="createBy"        column="create_by"          />
+        <result property="createTime"      column="create_time"        />
+        <result property="updateBy"        column="update_by"          />
+        <result property="updateTime"      column="update_time"        />
+        <result property="remark"          column="remark"             />
+        <result property="customerName"    column="customer_name"      />
+        <result property="belongUserId"    column="belong_user_id"     />
+        <result property="belongDeptId"    column="belong_dept_id"     />
+    </resultMap>
+
+    <sql id="selectCrmOrderVo">
+        select o.order_id, o.order_no, o.customer_id, o.contract_id, o.total_amount,
+               o.discount_amount, o.actual_amount, o.status, o.paid_amount,
+               o.payment_count, o.last_payment_time, o.source,
+               o.del_flag, o.create_by, o.create_time, o.update_by, o.update_time, o.remark,
+               o.belong_user_id, o.belong_dept_id,
+               c.customer_name
+        from crm_order o
+        left join crm_customer c on o.customer_id = c.customer_id
+    </sql>
+
+    <select id="selectCrmOrderList" parameterType="CrmOrder" resultMap="CrmOrderResult">
+        <include refid="selectCrmOrderVo"/>
+        where o.del_flag = '0'
+        <if test="orderNo != null and orderNo != ''">
+            AND o.order_no like concat('%', #{orderNo}, '%')
+        </if>
+        <if test="customerId != null">
+            AND o.customer_id = #{customerId}
+        </if>
+        <if test="customerName != null and customerName != ''">
+            AND c.customer_name like concat('%', #{customerName}, '%')
+        </if>
+        <if test="contractId != null">
+            AND o.contract_id = #{contractId}
+        </if>
+        <if test="status != null and status != ''">
+            AND o.status IN
+            <foreach item="s" collection="status.split(',')" open="(" separator="," close=")">
+                #{s}
+            </foreach>
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND date_format(o.create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            AND date_format(o.create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+        </if>
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+    </select>
+
+    <select id="selectCrmOrderById" parameterType="Long" resultMap="CrmOrderResult">
+        <include refid="selectCrmOrderVo"/>
+        where o.order_id = #{orderId}
+    </select>
+
+    <insert id="insertCrmOrder" parameterType="CrmOrder" useGeneratedKeys="true" keyProperty="orderId">
+        insert into crm_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">order_id,</if>
+            <if test="orderNo != null and orderNo != ''">order_no,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="contractId != null">contract_id,</if>
+            <if test="totalAmount != null">total_amount,</if>
+            <if test="discountAmount != null">discount_amount,</if>
+            <if test="actualAmount != null">actual_amount,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="paidAmount != null">paid_amount,</if>
+            <if test="paymentCount != null">payment_count,</if>
+            <if test="lastPaymentTime != null">last_payment_time,</if>
+            <if test="source != null and source != ''">source,</if>
+            <if test="belongUserId != null">belong_user_id,</if>
+            <if test="belongDeptId != null">belong_dept_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">#{orderId},</if>
+            <if test="orderNo != null and orderNo != ''">#{orderNo},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="contractId != null">#{contractId},</if>
+            <if test="totalAmount != null">#{totalAmount},</if>
+            <if test="discountAmount != null">#{discountAmount},</if>
+            <if test="actualAmount != null">#{actualAmount},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="paidAmount != null">#{paidAmount},</if>
+            <if test="paymentCount != null">#{paymentCount},</if>
+            <if test="lastPaymentTime != null">#{lastPaymentTime},</if>
+            <if test="source != null and source != ''">#{source},</if>
+            <if test="belongUserId != null">#{belongUserId},</if>
+            <if test="belongDeptId != null">#{belongDeptId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmOrder" parameterType="CrmOrder">
+        update crm_order
+        <set>
+            <if test="orderNo != null">order_no = #{orderNo},</if>
+            <if test="customerId != null">customer_id = #{customerId},</if>
+            <if test="contractId != null">contract_id = #{contractId},</if>
+            <if test="totalAmount != null">total_amount = #{totalAmount},</if>
+            <if test="discountAmount != null">discount_amount = #{discountAmount},</if>
+            <if test="actualAmount != null">actual_amount = #{actualAmount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="paidAmount != null">paid_amount = #{paidAmount},</if>
+            <if test="paymentCount != null">payment_count = #{paymentCount},</if>
+            <if test="lastPaymentTime != null">last_payment_time = #{lastPaymentTime},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="belongUserId != null">belong_user_id = #{belongUserId},</if>
+            <if test="belongDeptId != null">belong_dept_id = #{belongDeptId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where order_id = #{orderId}
+    </update>
+
+    <update id="deleteCrmOrderByIds" parameterType="String">
+        update crm_order set del_flag = '2' where order_id in
+        <foreach collection="array" item="orderId" open="(" separator="," close=")">
+            #{orderId}
+        </foreach>
+    </update>
+
+    <select id="sumMonthDealAmount" parameterType="CrmCustomer" resultType="Double">
+        select coalesce(sum(amount), 0) from (
+            select o.actual_amount as amount
+            from crm_order o
+            left join crm_customer c on o.customer_id = c.customer_id
+            where o.del_flag = '0' and o.status in ('1', '2')
+              and o.contract_id is null
+              and date_format(o.update_time, '%Y-%m') = #{params.month}
+            <if test="params.dataScope != null and params.dataScope != ''">
+                ${params.dataScope}
+            </if>
+            union all
+            select o.actual_amount
+            from crm_order o
+            left join crm_customer c on o.customer_id = c.customer_id
+            where o.del_flag = '0' and o.status in ('1', '2')
+              and o.contract_id is not null
+              and date_format(o.update_time, '%Y-%m') = #{params.month}
+            <if test="params.dataScope != null and params.dataScope != ''">
+                ${params.dataScope}
+            </if>
+            union all
+            select pp.actual_amount
+            from crm_payment_plan pp
+            left join crm_order o on pp.order_id = o.order_id
+            left join crm_customer c on o.customer_id = c.customer_id
+            where pp.del_flag = '0' and pp.status = '1'
+              and date_format(pp.actual_date, '%Y-%m') = #{params.month}
+            <if test="params.dataScope != null and params.dataScope != ''">
+                ${params.dataScope}
+            </if>
+        ) t
+    </select>
+
+    <select id="countGroupByStatus" parameterType="CrmOrder" resultType="java.util.Map">
+        SELECT o.status AS name, COUNT(1) AS value
+        FROM crm_order o
+        LEFT JOIN crm_customer c ON o.customer_id = c.customer_id
+        WHERE o.del_flag = '0'
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        GROUP BY o.status
+    </select>
+
+    <select id="selectByContractId" parameterType="Long" resultMap="CrmOrderResult">
+        <include refid="selectCrmOrderVo"/>
+        where o.contract_id = #{contractId} and o.del_flag = '0'
+    </select>
+
+    <update id="updateOrderPaymentTrack">
+        update crm_order
+        set payment_count = payment_count + 1,
+            last_payment_time = #{lastPaymentTime},
+            update_time = sysdate()
+        where order_id = #{orderId}
+    </update>
+
+    <update id="updateOrderBelongByCustomerId">
+        update crm_order
+        set belong_user_id = #{belongUserId}, belong_dept_id = #{belongDeptId}
+        where customer_id = #{customerId}
+    </update>
+
+    <update id="updateCustomerId">
+        update crm_order set customer_id = #{newId}, update_time = sysdate()
+        where customer_id = #{oldId}
+    </update>
+
+</mapper>

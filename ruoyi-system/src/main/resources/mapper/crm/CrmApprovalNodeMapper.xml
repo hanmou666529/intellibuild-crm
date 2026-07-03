@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmApprovalNodeMapper">
+
+    <resultMap type="CrmApprovalNode" id="CrmApprovalNodeResult">
+        <id     property="nodeId"          column="node_id"           />
+        <result property="requestId"       column="request_id"        />
+        <result property="stepOrder"       column="step_order"        />
+        <result property="nodeLabel"       column="node_label"        />
+        <result property="approverRole"    column="approver_role"     />
+        <result property="approverUserId"  column="approver_user_id"  />
+        <result property="approverName"    column="approver_name"     />
+        <result property="status"          column="status"            />
+        <result property="comment"         column="comment"           />
+        <result property="operateTime"     column="operate_time"      />
+        <result property="createTime"      column="create_time"       />
+    </resultMap>
+
+    <sql id="selectNodeVo">
+        select node_id, request_id, step_order, node_label, approver_role,
+               approver_user_id, approver_name, status, comment, operate_time, create_time
+        from crm_approval_node
+    </sql>
+
+    <select id="selectNodesByRequestId" parameterType="Long" resultMap="CrmApprovalNodeResult">
+        <include refid="selectNodeVo"/>
+        where request_id = #{requestId}
+        order by step_order
+    </select>
+
+    <select id="selectCrmApprovalNodeById" parameterType="Long" resultMap="CrmApprovalNodeResult">
+        <include refid="selectNodeVo"/>
+        where node_id = #{nodeId}
+    </select>
+
+    <insert id="insertCrmApprovalNode" parameterType="CrmApprovalNode" useGeneratedKeys="true" keyProperty="nodeId">
+        insert into crm_approval_node
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="requestId != null">request_id,</if>
+            <if test="stepOrder != null">step_order,</if>
+            <if test="nodeLabel != null">node_label,</if>
+            <if test="approverRole != null">approver_role,</if>
+            <if test="approverUserId != null">approver_user_id,</if>
+            <if test="approverName != null">approver_name,</if>
+            <if test="status != null">status,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="requestId != null">#{requestId},</if>
+            <if test="stepOrder != null">#{stepOrder},</if>
+            <if test="nodeLabel != null">#{nodeLabel},</if>
+            <if test="approverRole != null">#{approverRole},</if>
+            <if test="approverUserId != null">#{approverUserId},</if>
+            <if test="approverName != null">#{approverName},</if>
+            <if test="status != null">#{status},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into crm_approval_node (request_id, step_order, node_label, approver_role, status, create_time)
+        values
+        <foreach collection="list" item="n" separator=",">
+            (#{n.requestId}, #{n.stepOrder}, #{n.nodeLabel}, #{n.approverRole}, '0', sysdate())
+        </foreach>
+    </insert>
+
+    <update id="updateCrmApprovalNode" parameterType="CrmApprovalNode">
+        update crm_approval_node
+        <set>
+            <if test="approverUserId != null">approver_user_id = #{approverUserId},</if>
+            <if test="approverName != null">approver_name = #{approverName},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="comment != null">comment = #{comment},</if>
+            <if test="operateTime != null">operate_time = #{operateTime},</if>
+        </set>
+        where node_id = #{nodeId}
+    </update>
+
+</mapper>

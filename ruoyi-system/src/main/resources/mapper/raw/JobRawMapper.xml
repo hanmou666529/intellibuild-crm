@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.raw.mapper.JobRawMapper">
+    
+    <resultMap type="JobRaw" id="JobRawResult">
+        <result property="id"    column="id"    />
+        <result property="jobTitle"    column="job_title"    />
+        <result property="city"    column="city"    />
+        <result property="district"    column="district"    />
+        <result property="exp"    column="exp"    />
+        <result property="education"    column="education"    />
+        <result property="company"    column="company"    />
+        <result property="salaryLow"    column="salary_low"    />
+        <result property="salaryHigh"    column="salary_high"    />
+        <result property="field1"    column="field1"    />
+        <result property="field2"    column="field2"    />
+        <result property="field3"    column="field3"    />
+        <result property="field4"    column="field4"    />
+    </resultMap>
+
+    <sql id="selectJobRawVo">
+        select id, job_title, city, district, exp, education, company, salary_low, salary_high, field1, field2, field3, field4 from job_raw
+    </sql>
+
+    <select id="selectJobRawList" parameterType="JobRaw" resultMap="JobRawResult">
+        <include refid="selectJobRawVo"/>
+        <where>  
+            <if test="jobTitle != null  and jobTitle != ''"> and job_title = #{jobTitle}</if>
+            <if test="city != null  and city != ''"> and city = #{city}</if>
+            <if test="district != null  and district != ''"> and district = #{district}</if>
+            <if test="exp != null  and exp != ''"> and exp = #{exp}</if>
+            <if test="education != null  and education != ''"> and education = #{education}</if>
+            <if test="company != null  and company != ''"> and company = #{company}</if>
+            <if test="salaryLow != null "> and salary_low = #{salaryLow}</if>
+            <if test="salaryHigh != null "> and salary_high = #{salaryHigh}</if>
+            <if test="field1 != null  and field1 != ''"> and field1 = #{field1}</if>
+            <if test="field2 != null  and field2 != ''"> and field2 = #{field2}</if>
+            <if test="field3 != null  and field3 != ''"> and field3 = #{field3}</if>
+            <if test="field4 != null  and field4 != ''"> and field4 = #{field4}</if>
+        </where>
+    </select>
+    
+    <select id="selectJobRawById" parameterType="Long" resultMap="JobRawResult">
+        <include refid="selectJobRawVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertJobRaw" parameterType="JobRaw" useGeneratedKeys="true" keyProperty="id">
+        insert into job_raw
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="jobTitle != null and jobTitle != ''">job_title,</if>
+            <if test="city != null and city != ''">city,</if>
+            <if test="district != null">district,</if>
+            <if test="exp != null">exp,</if>
+            <if test="education != null">education,</if>
+            <if test="company != null">company,</if>
+            <if test="salaryLow != null">salary_low,</if>
+            <if test="salaryHigh != null">salary_high,</if>
+            <if test="field1 != null">field1,</if>
+            <if test="field2 != null">field2,</if>
+            <if test="field3 != null">field3,</if>
+            <if test="field4 != null">field4,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="jobTitle != null and jobTitle != ''">#{jobTitle},</if>
+            <if test="city != null and city != ''">#{city},</if>
+            <if test="district != null">#{district},</if>
+            <if test="exp != null">#{exp},</if>
+            <if test="education != null">#{education},</if>
+            <if test="company != null">#{company},</if>
+            <if test="salaryLow != null">#{salaryLow},</if>
+            <if test="salaryHigh != null">#{salaryHigh},</if>
+            <if test="field1 != null">#{field1},</if>
+            <if test="field2 != null">#{field2},</if>
+            <if test="field3 != null">#{field3},</if>
+            <if test="field4 != null">#{field4},</if>
+         </trim>
+    </insert>
+
+    <update id="updateJobRaw" parameterType="JobRaw">
+        update job_raw
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="jobTitle != null and jobTitle != ''">job_title = #{jobTitle},</if>
+            <if test="city != null and city != ''">city = #{city},</if>
+            <if test="district != null">district = #{district},</if>
+            <if test="exp != null">exp = #{exp},</if>
+            <if test="education != null">education = #{education},</if>
+            <if test="company != null">company = #{company},</if>
+            <if test="salaryLow != null">salary_low = #{salaryLow},</if>
+            <if test="salaryHigh != null">salary_high = #{salaryHigh},</if>
+            <if test="field1 != null">field1 = #{field1},</if>
+            <if test="field2 != null">field2 = #{field2},</if>
+            <if test="field3 != null">field3 = #{field3},</if>
+            <if test="field4 != null">field4 = #{field4},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteJobRawById" parameterType="Long">
+        delete from job_raw where id = #{id}
+    </delete>
+
+    <delete id="deleteJobRawByIds" parameterType="String">
+        delete from job_raw where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

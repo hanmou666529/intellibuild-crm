@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmContractMapper">
+
+    <resultMap type="CrmContract" id="CrmContractResult">
+        <id     property="contractId"      column="contract_id"        />
+        <result property="contractNo"      column="contract_no"        />
+        <result property="contractName"    column="contract_name"      />
+        <result property="customerId"      column="customer_id"        />
+        <result property="orderId"         column="order_id"           />
+        <result property="amount"          column="amount"             />
+        <result property="signDate"        column="sign_date"          />
+        <result property="startDate"       column="start_date"         />
+        <result property="endDate"         column="end_date"           />
+        <result property="status"          column="status"             />
+        <result property="attachment"      column="attachment"         />
+        <result property="delFlag"         column="del_flag"           />
+        <result property="createBy"        column="create_by"          />
+        <result property="createTime"      column="create_time"        />
+        <result property="updateBy"        column="update_by"          />
+        <result property="updateTime"      column="update_time"        />
+        <result property="remark"          column="remark"             />
+        <result property="customerName"    column="customer_name"      />
+        <result property="belongUserId"    column="belong_user_id"     />
+        <result property="belongDeptId"    column="belong_dept_id"     />
+        <result property="approvalCount"  column="approval_count"     />
+        <result property="lastApprovalTime" column="last_approval_time" />
+    </resultMap>
+
+    <sql id="selectCrmContractVo">
+        select ct.contract_id, ct.contract_no, ct.contract_name, ct.customer_id, ct.order_id,
+               ct.amount, ct.sign_date, ct.start_date, ct.end_date, ct.status, ct.attachment,
+               ct.del_flag, ct.create_by, ct.create_time, ct.update_by, ct.update_time, ct.remark,
+               ct.belong_user_id, ct.belong_dept_id,
+               ct.approval_count, ct.last_approval_time,
+               cu.customer_name
+        from crm_contract ct
+        left join crm_customer cu on ct.customer_id = cu.customer_id
+    </sql>
+
+    <select id="selectCrmContractList" parameterType="CrmContract" resultMap="CrmContractResult">
+        <include refid="selectCrmContractVo"/>
+        where ct.del_flag = '0'
+        <if test="contractNo != null and contractNo != ''">
+            AND ct.contract_no like concat('%', #{contractNo}, '%')
+        </if>
+        <if test="contractName != null and contractName != ''">
+            AND ct.contract_name like concat('%', #{contractName}, '%')
+        </if>
+        <if test="customerName != null and customerName != ''">
+            AND cu.customer_name like concat('%', #{customerName}, '%')
+        </if>
+        <if test="customerId != null">
+            AND ct.customer_id = #{customerId}
+        </if>
+        <if test="status != null and status != ''">
+            AND ct.status = #{status}
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''">
+            AND date_format(ct.sign_date,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''">
+            AND date_format(ct.sign_date,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+        </if>
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+    </select>
+
+    <select id="selectCrmContractById" parameterType="Long" resultMap="CrmContractResult">
+        <include refid="selectCrmContractVo"/>
+        where ct.contract_id = #{contractId}
+    </select>
+
+    <select id="countUnpaidByContractId" parameterType="Long" resultType="int">
+        select count(*)
+        from crm_payment_plan pp
+        left join crm_order o on pp.order_id = o.order_id
+        where o.contract_id = #{contractId}
+          and pp.del_flag = '0' and pp.status != '1'
+    </select>
+
+    <insert id="insertCrmContract" parameterType="CrmContract" useGeneratedKeys="true" keyProperty="contractId">
+        insert into crm_contract
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contractId != null">contract_id,</if>
+            <if test="contractNo != null and contractNo != ''">contract_no,</if>
+            <if test="contractName != null and contractName != ''">contract_name,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="orderId != null">order_id,</if>
+            <if test="amount != null">amount,</if>
+            <if test="signDate != null">sign_date,</if>
+            <if test="startDate != null">start_date,</if>
+            <if test="endDate != null">end_date,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="attachment != null and attachment != ''">attachment,</if>
+            <if test="belongUserId != null">belong_user_id,</if>
+            <if test="belongDeptId != null">belong_dept_id,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="contractId != null">#{contractId},</if>
+            <if test="contractNo != null and contractNo != ''">#{contractNo},</if>
+            <if test="contractName != null and contractName != ''">#{contractName},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="orderId != null">#{orderId},</if>
+            <if test="amount != null">#{amount},</if>
+            <if test="signDate != null">#{signDate},</if>
+            <if test="startDate != null">#{startDate},</if>
+            <if test="endDate != null">#{endDate},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="attachment != null and attachment != ''">#{attachment},</if>
+            <if test="belongUserId != null">#{belongUserId},</if>
+            <if test="belongDeptId != null">#{belongDeptId},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmContract" parameterType="CrmContract">
+        update crm_contract
+        <set>
+            <if test="contractNo != null">contract_no = #{contractNo},</if>
+            <if test="contractName != null">contract_name = #{contractName},</if>
+            <if test="customerId != null">customer_id = #{customerId},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
+            <if test="amount != null">amount = #{amount},</if>
+            <if test="signDate != null">sign_date = #{signDate},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="attachment != null">attachment = #{attachment},</if>
+            <if test="belongUserId != null">belong_user_id = #{belongUserId},</if>
+            <if test="belongDeptId != null">belong_dept_id = #{belongDeptId},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where contract_id = #{contractId}
+    </update>
+
+    <update id="deleteCrmContractByIds" parameterType="String">
+        update crm_contract set del_flag = '2' where contract_id in
+        <foreach collection="array" item="contractId" open="(" separator="," close=")">
+            #{contractId}
+        </foreach>
+    </update>
+
+    <select id="selectExpiredContracts" resultMap="CrmContractResult">
+        <include refid="selectCrmContractVo"/>
+        where ct.del_flag = '0' and ct.status = '1'
+          and ct.end_date is not null and ct.end_date &lt; now()
+    </select>
+
+    <update id="updateContractBelongByCustomerId">
+        update crm_contract
+        set belong_user_id = #{belongUserId}, belong_dept_id = #{belongDeptId}
+        where customer_id = #{customerId}
+    </update>
+
+    <select id="countContractByStatus" parameterType="CrmContract" resultType="java.util.Map">
+        SELECT c.status AS name, COUNT(1) AS value
+        FROM crm_contract c
+        WHERE c.del_flag = '0'
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        GROUP BY c.status
+    </select>
+
+    <select id="countPendingApproval" parameterType="CrmContract" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM crm_contract c
+        WHERE c.del_flag = '0' AND c.status = '0'
+          AND EXISTS (SELECT 1 FROM crm_approval_request r
+                       WHERE r.biz_id = c.contract_id AND r.biz_type = 'contract' AND r.del_flag = '0')
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+    </select>
+
+    <select id="sumMonthAmount" parameterType="CrmContract" resultType="java.util.Map">
+        SELECT DATE_FORMAT(c.create_time, '%Y-%m') AS month, SUM(c.amount) AS total
+        FROM crm_contract c
+        WHERE c.del_flag = '0'
+          AND c.create_time &gt;= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 5 MONTH), '%Y-%m-01')
+        <if test="params.dataScope != null and params.dataScope != ''">
+            ${params.dataScope}
+        </if>
+        GROUP BY month
+        ORDER BY month
+    </select>
+
+    <update id="updateCustomerId">
+        update crm_contract set customer_id = #{newId}, update_time = sysdate()
+        where customer_id = #{oldId}
+    </update>
+
+</mapper>

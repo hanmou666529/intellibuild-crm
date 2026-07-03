@@ -1,0 +1,44 @@
+// CRM 紧凑表格样式
+
+.search-form .el-form-item {
+  margin-bottom: 4px;
+}
+.search-form .el-input__inner {
+  height: 32px;
+  line-height: 32px;
+}
+.search-form .el-button {
+  padding: 7px 15px;
+}
+
+.el-table--mini th.el-table__cell {
+  padding: 5px 0;
+}
+.el-table--mini td.el-table__cell {
+  padding: 3px 0;
+}
+.el-table__body-wrapper .el-table__row {
+  height: 36px;
+}
+.el-table__row:hover td.el-table__cell:not(.el-table-column--selection) {
+  box-shadow: inset 3px 0 0 #000;
+}
+.el-table__row td.el-table__cell:first-child:not(.el-table-column--selection) {
+  padding-left: 12px;
+}
+
+.el-table .el-button--text {
+  font-size: 12px;
+  padding: 2px 4px;
+}
+.el-table .el-button--text + .el-button--text {
+  margin-left: 4px;
+}
+
+.el-pagination {
+  padding: 8px 0;
+}
+
+.el-table__empty-text {
+  line-height: 60px;
+}

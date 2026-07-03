@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmTagMapper">
+
+    <resultMap type="CrmTag" id="CrmTagResult">
+        <id     property="tagId"      column="tag_id"      />
+        <result property="tagName"    column="tag_name"    />
+        <result property="tagType"    column="tag_type"    />
+        <result property="color"      column="color"       />
+        <result property="sortOrder"  column="sort_order"  />
+        <result property="status"     column="status"      />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+        <result property="remark"     column="remark"      />
+    </resultMap>
+
+    <sql id="selectCrmTagVo">
+        select tag_id, tag_name, tag_type, color, sort_order, status,
+               del_flag, create_by, create_time, update_by, update_time, remark
+        from crm_tag
+    </sql>
+
+    <select id="selectCrmTagList" parameterType="CrmTag" resultMap="CrmTagResult">
+        <include refid="selectCrmTagVo"/>
+        where del_flag = '0'
+        <if test="tagName != null and tagName != ''">AND tag_name like concat('%', #{tagName}, '%')</if>
+        <if test="tagType != null and tagType != ''">AND tag_type = #{tagType}</if>
+        <if test="status != null and status != ''">AND status = #{status}</if>
+        order by tag_type, sort_order
+    </select>
+
+    <select id="selectCrmTagById" parameterType="Long" resultMap="CrmTagResult">
+        <include refid="selectCrmTagVo"/> where tag_id = #{tagId}
+    </select>
+
+    <select id="selectCrmTagByType" parameterType="String" resultMap="CrmTagResult">
+        <include refid="selectCrmTagVo"/>
+        where del_flag = '0' and status = '0'
+        <if test="_parameter != null and _parameter != ''">and tag_type = #{tagType}</if>
+        order by tag_type, sort_order
+    </select>
+
+    <insert id="insertCrmTag" parameterType="CrmTag" useGeneratedKeys="true" keyProperty="tagId">
+        insert into crm_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tagId != null">tag_id,</if>
+            <if test="tagName != null and tagName != ''">tag_name,</if>
+            <if test="tagType != null and tagType != ''">tag_type,</if>
+            <if test="color != null and color != ''">color,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tagId != null">#{tagId},</if>
+            <if test="tagName != null and tagName != ''">#{tagName},</if>
+            <if test="tagType != null and tagType != ''">#{tagType},</if>
+            <if test="color != null and color != ''">#{color},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmTag" parameterType="CrmTag">
+        update crm_tag
+        <set>
+            <if test="tagName != null and tagName != ''">tag_name = #{tagName},</if>
+            <if test="tagType != null and tagType != ''">tag_type = #{tagType},</if>
+            <if test="color != null and color != ''">color = #{color},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where tag_id = #{tagId}
+    </update>
+
+    <delete id="deleteCrmTagByIds" parameterType="String">
+        update crm_tag set del_flag = '2' where tag_id in
+        <foreach collection="array" item="tagId" open="(" separator="," close=")">#{tagId}</foreach>
+    </delete>
+</mapper>

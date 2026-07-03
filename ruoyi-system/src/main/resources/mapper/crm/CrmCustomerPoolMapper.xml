@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmCustomerPoolMapper">
+
+    <resultMap type="CrmCustomerPool" id="CrmCustomerPoolResult">
+        <id     property="logId"           column="log_id"             />
+        <result property="customerId"      column="customer_id"        />
+        <result property="action"          column="action"             />
+        <result property="fromUserId"      column="from_user_id"       />
+        <result property="toUserId"        column="to_user_id"         />
+        <result property="reason"          column="reason"             />
+        <result property="createBy"        column="create_by"          />
+        <result property="createTime"      column="create_time"        />
+        <result property="customerName"    column="customer_name"      />
+        <result property="fromUserName"    column="from_user_name"     />
+        <result property="toUserName"      column="to_user_name"       />
+    </resultMap>
+
+    <sql id="selectCrmCustomerPoolVo">
+        select l.log_id, l.customer_id, l.action, l.from_user_id, l.to_user_id,
+               l.reason, l.create_by, l.create_time,
+               c.customer_name, fu.user_name as from_user_name, tu.user_name as to_user_name
+        from crm_customer_pool_log l
+        left join crm_customer c on l.customer_id = c.customer_id
+        left join sys_user fu on l.from_user_id = fu.user_id
+        left join sys_user tu on l.to_user_id = tu.user_id
+    </sql>
+
+    <select id="selectCrmCustomerPoolList" parameterType="CrmCustomerPool" resultMap="CrmCustomerPoolResult">
+        <include refid="selectCrmCustomerPoolVo"/>
+        <where>
+            <if test="customerId != null">
+                AND l.customer_id = #{customerId}
+            </if>
+            <if test="action != null and action != ''">
+                AND l.action = #{action}
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''">
+                AND date_format(l.create_time,'%Y%m%d') &gt;= date_format(#{params.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''">
+                AND date_format(l.create_time,'%Y%m%d') &lt;= date_format(#{params.endTime},'%Y%m%d')
+            </if>
+        </where>
+        order by l.create_time desc
+    </select>
+
+    <insert id="insertCrmCustomerPool" parameterType="CrmCustomerPool" useGeneratedKeys="true" keyProperty="logId">
+        insert into crm_customer_pool_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="logId != null">log_id,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="action != null and action != ''">action,</if>
+            <if test="fromUserId != null">from_user_id,</if>
+            <if test="toUserId != null">to_user_id,</if>
+            <if test="reason != null and reason != ''">reason,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="logId != null">#{logId},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="action != null and action != ''">#{action},</if>
+            <if test="fromUserId != null">#{fromUserId},</if>
+            <if test="toUserId != null">#{toUserId},</if>
+            <if test="reason != null and reason != ''">#{reason},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+</mapper>

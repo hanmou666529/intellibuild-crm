@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmApprovalTemplateMapper">
+
+    <resultMap type="CrmApprovalTemplate" id="CrmApprovalTemplateResult">
+        <id     property="templateId"   column="template_id"    />
+        <result property="templateName" column="template_name"  />
+        <result property="bizType"      column="biz_type"       />
+        <result property="rules"        column="rules"          />
+        <result property="status"       column="status"         />
+        <result property="delFlag"      column="del_flag"       />
+        <result property="createBy"     column="create_by"      />
+        <result property="createTime"   column="create_time"    />
+        <result property="updateBy"     column="update_by"      />
+        <result property="updateTime"   column="update_time"    />
+        <result property="remark"       column="remark"         />
+    </resultMap>
+
+    <sql id="selectTemplateVo">
+        select template_id, template_name, biz_type, rules, status, del_flag,
+               create_by, create_time, update_by, update_time, remark
+        from crm_approval_template
+    </sql>
+
+    <select id="selectCrmApprovalTemplateList" parameterType="CrmApprovalTemplate" resultMap="CrmApprovalTemplateResult">
+        <include refid="selectTemplateVo"/>
+        where del_flag = '0'
+        <if test="templateName != null and templateName != ''">
+            AND template_name like concat('%', #{templateName}, '%')
+        </if>
+        <if test="bizType != null and bizType != ''">
+            AND biz_type = #{bizType}
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        order by create_time desc
+    </select>
+
+    <select id="selectCrmApprovalTemplateById" parameterType="Long" resultMap="CrmApprovalTemplateResult">
+        <include refid="selectTemplateVo"/>
+        where template_id = #{templateId}
+    </select>
+
+    <select id="selectTemplateByBizType" parameterType="String" resultMap="CrmApprovalTemplateResult">
+        <include refid="selectTemplateVo"/>
+        where del_flag = '0' and status = '0' and biz_type = #{bizType}
+        limit 1
+    </select>
+
+    <insert id="insertCrmApprovalTemplate" parameterType="CrmApprovalTemplate" useGeneratedKeys="true" keyProperty="templateId">
+        insert into crm_approval_template
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateName != null and templateName != ''">template_name,</if>
+            <if test="bizType != null and bizType != ''">biz_type,</if>
+            <if test="rules != null and rules != ''">rules,</if>
+            <if test="status != null">status,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateName != null and templateName != ''">#{templateName},</if>
+            <if test="bizType != null and bizType != ''">#{bizType},</if>
+            <if test="rules != null and rules != ''">#{rules},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateCrmApprovalTemplate" parameterType="CrmApprovalTemplate">
+        update crm_approval_template
+        <set>
+            <if test="templateName != null">template_name = #{templateName},</if>
+            <if test="bizType != null">biz_type = #{bizType},</if>
+            <if test="rules != null">rules = #{rules},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </set>
+        where template_id = #{templateId}
+    </update>
+
+    <update id="deleteCrmApprovalTemplateByIds" parameterType="String">
+        update crm_approval_template set del_flag = '2' where template_id in
+        <foreach collection="array" item="templateId" open="(" separator="," close=")">#{templateId}</foreach>
+    </update>
+
+</mapper>

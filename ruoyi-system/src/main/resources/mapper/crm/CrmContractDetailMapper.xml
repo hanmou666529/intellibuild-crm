@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.crm.mapper.CrmContractDetailMapper">
+
+    <resultMap type="CrmContractDetail" id="CrmContractDetailResult">
+        <id     property="detailId"         column="detail_id"          />
+        <result property="contractId"       column="contract_id"        />
+        <result property="productId"        column="product_id"         />
+        <result property="productName"      column="product_name"       />
+        <result property="productPrice"     column="product_price"      />
+        <result property="quantity"         column="quantity"           />
+        <result property="subtotal"         column="subtotal"           />
+        <result property="remark"           column="remark"             />
+        <result property="delFlag"          column="del_flag"           />
+        <result property="createBy"         column="create_by"          />
+        <result property="createTime"       column="create_time"        />
+        <result property="updateBy"         column="update_by"          />
+        <result property="updateTime"       column="update_time"        />
+    </resultMap>
+
+    <sql id="selectCrmContractDetailVo">
+        select d.detail_id, d.contract_id, d.product_id, d.product_name, d.product_price,
+               d.quantity, d.subtotal, d.remark, d.del_flag, d.create_by, d.create_time,
+               d.update_by, d.update_time
+        from crm_contract_detail d
+    </sql>
+
+    <select id="selectCrmContractDetailByContractId" parameterType="Long" resultMap="CrmContractDetailResult">
+        <include refid="selectCrmContractDetailVo"/>
+        where d.contract_id = #{contractId}
+    </select>
+
+    <insert id="insertCrmContractDetail" parameterType="CrmContractDetail" useGeneratedKeys="true" keyProperty="detailId">
+        insert into crm_contract_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="detailId != null">detail_id,</if>
+            <if test="contractId != null">contract_id,</if>
+            <if test="productId != null">product_id,</if>
+            <if test="productName != null and productName != ''">product_name,</if>
+            <if test="productPrice != null">product_price,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="subtotal != null">subtotal,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="delFlag != null and delFlag != ''">del_flag,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null and updateBy != ''">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="detailId != null">#{detailId},</if>
+            <if test="contractId != null">#{contractId},</if>
+            <if test="productId != null">#{productId},</if>
+            <if test="productName != null and productName != ''">#{productName},</if>
+            <if test="productPrice != null">#{productPrice},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="subtotal != null">#{subtotal},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="delFlag != null and delFlag != ''">#{delFlag},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertCrmContractDetails" parameterType="java.util.List">
+        insert into crm_contract_detail (contract_id, product_id, product_name, product_price, quantity, subtotal, remark) values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.contractId}, #{item.productId}, #{item.productName}, #{item.productPrice}, #{item.quantity}, #{item.subtotal}, #{item.remark})
+        </foreach>
+    </insert>
+
+    <update id="updateCrmContractDetail" parameterType="CrmContractDetail">
+        update crm_contract_detail
+        <set>
+            <if test="productId != null">product_id = #{productId},</if>
+            <if test="productName != null">product_name = #{productName},</if>
+            <if test="productPrice != null">product_price = #{productPrice},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="subtotal != null">subtotal = #{subtotal},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </set>
+        where detail_id = #{detailId}
+    </update>
+
+    <delete id="deleteCrmContractDetailByContractId" parameterType="Long">
+        delete from crm_contract_detail where contract_id = #{contractId}
+    </delete>
+
+    <delete id="deleteCrmContractDetailByIds" parameterType="String">
+        delete from crm_contract_detail where detail_id in
+        <foreach collection="array" item="detailId" open="(" separator="," close=")">
+            #{detailId}
+        </foreach>
+    </delete>
+
+</mapper>
