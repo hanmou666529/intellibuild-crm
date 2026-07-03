@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="logo" src="https://oscimg.oschina.net/oscnet/up-d3d0a9303e11d522a06cd263f3079027715.png" width="80">
+  <img alt="logo" src="logo.png" width="80">
 </p>
 <h1 align="center">智营 CRM · IntelliBuild CRM</h1>
 <p align="center">
