@@ -102,7 +102,7 @@
 
 ---
 
-## 🚀 快速启动
+## 🚀 快速启动（用户指南）
 
 ### 环境要求
 
@@ -112,17 +112,72 @@
 - Redis
 - Node.js 14+
 
-### 后端
+---
+
+### 第一步：初始化数据库
+
+项目使用 MySQL 8.0，首次使用前需要先导入数据库脚本。
 
 ```bash
-# 构建
+# 1. 登录 MySQL
+mysql -u root -p
+
+# 2. 创建数据库
+mysql> CREATE DATABASE IF NOT EXISTS `ry-vue` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+mysql> exit
+
+# 3. 导入项目提供的 SQL 脚本（含表结构 + 初始数据）
+mysql -u root -p ry-vue < sql/ry-vue.sql
+```
+
+> `sql/ry-vue.sql` 包含完整的数据库表结构和演示数据，是项目正常运行的前提，**必须执行**。
+
+---
+
+### 第二步：修改数据库连接配置
+
+打开 `ruoyi-admin/src/main/resources/application-druid.yml`，修改数据库连接信息为你自己的配置：
+
+```yaml
+# 第 9-11 行
+url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+username: root          # 改为你的数据库用户名
+password: Hae147258369  # 改为你的数据库密码
+```
+
+---
+
+### 第三步：配置 Redis
+
+打开 `ruoyi-admin/src/main/resources/application.yml`，确认 Redis 连接配置：
+
+```yaml
+# 第 40-45 行左右
+redis:
+  host: localhost
+  port: 6379
+  password:       # 如未设密码则留空
+```
+
+确保本地 Redis 服务已启动。
+
+---
+
+### 第四步：启动后端
+
+```bash
+# 构建项目
 mvn clean install -DskipTests
 
-# 启动
+# 启动服务
 java -jar ruoyi-admin/target/ruoyi-admin.jar
 ```
 
-### 前端
+后端默认启动在 `http://localhost:8080`。
+
+---
+
+### 第五步：启动前端
 
 ```bash
 cd ruoyi-ui
@@ -130,22 +185,22 @@ cd ruoyi-ui
 # 安装依赖
 npm install
 
-# 开发模式
+# 开发模式运行（热更新）
 npm run dev
-
-# 构建
-npm run build:prod
 ```
 
-### 数据库
+前端默认启动在 `http://localhost:1024`，浏览器打开即可访问。
 
-```sql
--- 创建数据库
-CREATE DATABASE `ry-vue` DEFAULT CHARACTER SET utf8mb4;
+> 如需打包部署，使用 `npm run build:prod`，产物在 `ruoyi-ui/dist/`。
 
--- 导入 SQL
-mysql -u root -p < sql/ry-vue.sql
-```
+---
+
+### 默认账号
+
+| 角色 | 账号 | 密码 |
+|------|------|------|
+| 管理员 | admin | admin123 |
+| 普通用户 | ry | admin123 |
 
 ---
 
